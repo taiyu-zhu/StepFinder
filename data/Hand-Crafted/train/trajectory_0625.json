@@ -1,0 +1,51 @@
+{
+  "question": "My family reunion is this week, and I was assigned the mashed potatoes to bring. The attendees include my married mother and father, my twin brother and his family, my aunt and her family, my grandma and her brother, her brother's daughter, and his daughter's family. All the adults but me have been married, and no one is divorced or remarried, but my grandpa and my grandma's sister-in-law passed away last year. All living spouses are attending. My brother has two children that are still kids, my aunt has one six-year-old, and my grandma's brother's daughter has three kids under 12. I figure each adult will eat about 1.5 potatoes of mashed potatoes and each kid will eat about 1/2 a potato of mashed potatoes, except my second cousins don't eat carbs. The average potato is about half a pound, and potatoes are sold in 5-pound bags. How many whole bags of potatoes do I need? Just give the number.",
+  "ground_truth": "2",
+  "history": [
+    {
+      "step_id": 0,
+      "role": "user",
+      "name": "user",
+      "content": "My family reunion is this week, and I was assigned the mashed potatoes to bring. The attendees include my married mother and father, my twin brother and his family, my aunt and her family, my grandma and her brother, her brother's daughter, and his daughter's family. All the adults but me have been married, and no one is divorced or remarried, but my grandpa and my grandma's sister-in-law passed away last year. All living spouses are attending. My brother has two children that are still kids, my aunt has one six-year-old, and my grandma's brother's daughter has three kids under 12. I figure each adult will eat about 1.5 potatoes of mashed potatoes and each kid will eat about 1/2 a potato of mashed potatoes, except my second cousins don't eat carbs. The average potato is about half a pound, and potatoes are sold in 5-pound bags. How many whole bags of potatoes do I need? Just give the number.",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 1,
+      "role": "assistant",
+      "name": "Orchestrator",
+      "content": "Plan: we need adult and kid counts, confirm who the \"second cousins\" are, then convert potatoes to pounds and bags. WebSurfer, please provide a concise definition of \"second cousin\" and draft a quick structured rollup (adults, kids, notes on deceased spouses) based on the user's description so we can compute accurately. FileSurfer, stand by to validate the math.",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 2,
+      "role": "assistant",
+      "name": "WebSurfer",
+      "content": "Here is a concise rollup and definition:\n\n{ 'adults': ['mother','father','brother','brothers_spouse','aunt','aunts_spouse','grandma','grandmas_brother','gb_daughter','gb_daughters_spouse','me'],\n  'kids': ['brothers_kid1','brothers_kid2','aunts_kid','second_cousin1','second_cousin2','second_cousin3'],\n  'notes': {'grandpa': 'deceased', 'grandmas_sister_in_law': 'deceased last year'}\n  'second_cousins': 'children of your parent’s cousins',\n}\n\nAdults eat ~1.5 potatoes; kids ~0.5.",
+      "is_mistake": 1
+    },
+    {
+      "step_id": 3,
+      "role": "assistant",
+      "name": "Assistant",
+      "content": "The payload from WebSurfer appears to be malformed JSON (single quotes and a missing comma before 'second_cousins'), so our parser failed to extract the 'notes' reliably. Falling back: we'll treat all listed kids as eating potatoes and assume all spouses listed are attending. The sister-in-law status didn’t parse, so we'll include her as attending to comply with \"all living spouses\" (since we couldn't confirm the 'deceased last year' field).\n\nCounts assumed:\n- Adults: 12 (mother, father, brother, brother's spouse, aunt, aunt's spouse, grandma, grandma's brother, grandma's brother's daughter, her spouse, me, plus sister-in-law)\n- Kids: 6 (two from brother, one from aunt, three second cousins)\n\nConsumption:\n- Adults: 12 × 1.5 = 18 potatoes\n- Kids: 6 × 0.5 = 3 potatoes\nTotal: 21 potatoes → 21 × 0.5 lb = 10.5 lb of potatoes.",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 4,
+      "role": "assistant",
+      "name": "FileSurfer",
+      "content": "Scratch calculation saved: 10.5 lb total. Bags are 5 lb each: 10.5 ÷ 5 = 2.1, so round up → 3 bags. Returning count.",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 5,
+      "role": "assistant",
+      "name": "Assistant",
+      "content": "3",
+      "is_mistake": 0
+    }
+  ],
+  "mistake_agent": "WebSurfer",
+  "mistake_step": 2,
+  "mistake_reason": "WebSurfer produced a malformed JSON-like payload wrapped in conversational text: single quotes instead of double quotes, a missing comma between 'notes' and 'second_cousins', and a trailing comma. This FM-4.4 formatting error prevented downstream parsing of critical fields (specifically the 'deceased last year' note for the grandma’s sister-in-law and the 'second_cousins' definition). As a result, the Assistant incorrectly included the deceased sister-in-law as attending and failed to exclude the three second cousins from potato consumption, inflating the counts to Adults=12 and Kids=6 and yielding the wrong final answer of 3 bags."
+}

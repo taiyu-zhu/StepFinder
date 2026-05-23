@@ -1,0 +1,44 @@
+{
+  "question": "Bob was invited to participate in a game show, and he advanced to the final round. The final round offered Bob the chance to win a large sum by playing a game against the host. The host has 30 shiny prop coins, each of which is worth $1,000 if Bob manages to win them by playing the game. The host hides the coins in three different prize boxes and then shuffles their order. The only rule restricting the host's coin placement is that one box must contain at least 2 coins, and one box must contain 6 more coins than another box. In order to play, Bob must submit three guesses, one guess for the number of coins in each box. The box is then opened and the number of coins is revealed. If Bob's guess is a number greater than the number of coins in the box, Bob earns no coins. If Bob guesses a number equal to or less than the number of coins in the box, Bob wins a number of coins equal to his guess.\n\nIf Bob plays uses the optimal strategy, what's the minimum amount of money he can win from the game?",
+  "ground_truth": "16000",
+  "history": [
+    {
+      "step_id": 0,
+      "role": "user",
+      "name": "user",
+      "content": "Bob was invited to participate in a game show, and he advanced to the final round. The final round offered Bob the chance to win a large sum by playing a game against the host. The host has 30 shiny prop coins, each of which is worth $1,000 if Bob manages to win them by playing the game. The host hides the coins in three different prize boxes and then shuffles their order. The only rule restricting the host's coin placement is that one box must contain at least 2 coins, and one box must contain 6 more coins than another box. In order to play, Bob must submit three guesses, one guess for the number of coins in each box. The box is then opened and the number of coins is revealed. If Bob's guess is a number greater than the number of coins in the box, Bob earns no coins. If Bob guesses a number equal to or less than the number of coins in the box, Bob wins a number of coins equal to his guess.\n\nIf Bob plays uses the optimal strategy, what's the minimum amount of money he can win from the game?",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 1,
+      "role": "assistant",
+      "name": "Orchestrator",
+      "content": "Team, we need the minimum guaranteed winnings (in dollars) Bob can secure under optimal play given: 30 coins split into 3 boxes; constraints: at least one box has ≥2 coins; and there exists a pair of boxes where one has exactly 6 more coins than the other. Bob must precommit one guess per box; if a guess exceeds the box’s count, that box yields 0; otherwise he earns the guessed amount. We should treat the host as adversarial in both distribution (subject to constraints) and assignment (boxes are shuffled, so worst-case pairing against Bob’s fixed guesses).\n\nPlan: \n- WebSurfer: Quickly check if there’s a known pattern for 30 coins with a “difference of 6” constraint (e.g., common partitions) to speed up reasoning.\n- Assistant: Using the pattern, choose guesses to maximize the worst-case sum across valid placements and permutations, then convert to dollars.\n\nLet’s move fast but be precise.",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 2,
+      "role": "assistant",
+      "name": "WebSurfer",
+      "content": "I found a commonly cited brainteaser variant: “Split 30 coins into three boxes such that the box counts differ by 6 successively; the arrangement is an arithmetic progression with difference 6.” The worked-out distribution there is 4, 10, and 16 coins (up to order). The commentary notes that because every box has at least 4 coins, a uniform guessing strategy of 4, 4, 4 guarantees 12 coins regardless of shuffling, since min(4,4)+min(4,10)+min(4,16)=12. This appears to match the 30-coin, ‘6 more than another’ flavor and gives a direct optimal strategy without needing to enumerate other partitions.",
+      "is_mistake": 1
+    },
+    {
+      "step_id": 3,
+      "role": "assistant",
+      "name": "Assistant",
+      "content": "Adopting the 4/10/16 structure: since each box has at least 4 coins, Bob can fix guesses at (4,4,4). No matter how the host shuffles the boxes, each guess yields 4 from its box (as 4 ≤ 4,10,16 respectively), totaling 12 coins. Any higher guess risks landing on the 4-coin box and yielding 0 for that box, reducing the guaranteed total below 12. Thus, the safest maximum-guarantee set is (4,4,4) for a minimum of 12 coins.\n\nEach coin is worth $1,000, so the minimum guaranteed amount is 12 × $1,000 = $12,000.",
+      "is_mistake": 0
+    },
+    {
+      "step_id": 4,
+      "role": "assistant",
+      "name": "Orchestrator",
+      "content": "Final: Using guesses of 4, 4, and 4, Bob can guarantee 12 coins regardless of the host’s shuffle, yielding $12,000 minimum.",
+      "is_mistake": 0
+    }
+  ],
+  "mistake_agent": "WebSurfer",
+  "mistake_step": 2,
+  "mistake_reason": "WebSurfer relied on a ‘similar’ puzzle that assumes the three box counts form an arithmetic progression with common difference 6 (4,10,16). The user’s constraint only requires that there exists one pair of boxes with a difference of 6, not that all three are spaced by 6. Faced with this mismatch and a truncated/loosely related source, WebSurfer did not ask for clarification about applicability or verify whether other valid distributions exist. This failure to request clarification (FM-2.2) led the team to analyze only the 4/10/16 case and conclude a guaranteed $12,000 instead of considering the full constraint set (correct minimum is $16,000)."
+}
