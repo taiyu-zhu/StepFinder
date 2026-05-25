@@ -1,14 +1,12 @@
 # StepFinder: A Temporal Semantic Framework for Failure Attribution in Multi-Agent Systems
 
-> KDD 2026
-
 ## Overview
 
 StepFinder is a lightweight framework for step-level failure attribution in LLM-based multi-agent systems (MAS). It encodes execution logs into temporal semantic sequences and applies a parameter-efficient combination of temporal modeling and attention modules to identify the root cause step.
 
 ## Requirements
 
-To install requirements:
+Python 3.10 or higher is required. To install requirements:
 
 ```bash
 pip install -r requirements.txt
