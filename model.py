@@ -158,8 +158,8 @@ class StepLevelErrorScoring(nn.Module):
         self,
         hidden_dim: int = 128,
         scales: list[int] = None,
-        beta: float = 0.9,
-        gamma: float = 0.4,
+        beta: float = 0.1,
+        gamma: float = 0.1,
     ) -> None:
         super().__init__()
         self.scales = scales if scales is not None else [1, 2]
@@ -187,7 +187,7 @@ class StepLevelErrorScoring(nn.Module):
     ) -> torch.Tensor:
         """
         Compute normalized multi-scale temporal difference scores Delta_t.
-        
+
         Returns:
             Delta: Averaged normalized difference scores [B, T].
         """
