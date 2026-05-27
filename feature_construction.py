@@ -42,10 +42,6 @@ class TemporalFeatureExtractor:
         """
         Encode a single text string into a fixed-dimension embedding.
 
-        Args:
-            text: Input text to encode.
-            dim:  Target embedding dimension.
-
         Returns:
             Embedding array of shape [dim], dtype float32.
         """
