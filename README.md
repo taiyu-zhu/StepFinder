@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ## Data Preparation
 
-The training trajectories are provided in this repository under `data/`. For evaluation, download the Who&When benchmark test sets from [their repository](https://github.com/mingyin1/Agents_Failure_Attribution) and place them as follows:
+The training trajectories are provided in this repository under `data/`. For evaluation, download the Who&When benchmark test sets from [their repository](https://github.com/mingyin1/Agents_Failure_Attribution) and organize the data as follows:
 
 ```
 data/
