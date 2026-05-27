@@ -158,8 +158,8 @@ class StepLevelErrorScoring(nn.Module):
         self,
         hidden_dim: int = 128,
         scales: list[int] = None,
-        beta: float = 0.1,
-        gamma: float = 0.1,
+        beta: float = 0.9,
+        gamma: float = 0.4,
     ) -> None:
         super().__init__()
         self.scales = scales if scales is not None else [1, 2]
@@ -274,8 +274,8 @@ class StepFinder(nn.Module):
         num_heads: int = 2,
         head_dim: int = 32,
         alpha: float = 0.1,
-        beta: float = 0.1,
-        gamma: float = 0.1,
+        beta: float = 0.9,
+        gamma: float = 0.4,
         scales: list[int] = None,
         dropout: float = 0.5,
     ) -> None:
@@ -325,7 +325,7 @@ def compute_loss(
     targets: torch.Tensor,
     mask: torch.Tensor,
     temporal_loss: torch.Tensor,
-    lambda_temporal: float = 0.1,
+    lambda_temporal: float = 0.9,
 ) -> torch.Tensor:
     """
     Joint training loss: cross-entropy + lambda * temporal consistency.
