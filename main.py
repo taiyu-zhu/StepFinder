@@ -46,13 +46,37 @@ def load_data_from_dir(data_dir: str) -> list:
         print(f"[WARNING] Directory not found: {data_dir}")
         return all_seqs
 
-    file_list = [f for f in os.listdir(data_dir) if f.endswith(".json")]
+    file_list = sorted(f for f in os.listdir(data_dir) if f.endswith(".json"))
     for filename in tqdm(file_list, desc=f"Loading {os.path.basename(data_dir)}"):
         cpath = get_cache_path(data_dir, filename)
         if os.path.exists(cpath):
-            all_seqs.append(torch.load(cpath, weights_only=False))
+            sequence = torch.load(cpath, weights_only=False)
+            labels = torch.as_tensor(sequence.get("mistake_labels", []))
+            content = torch.as_tensor(sequence.get("content_features", []))
+            agent = torch.as_tensor(sequence.get("agent_features", []))
+            labels_are_binary = bool(
+                labels.numel() > 0 and torch.all((labels == 0) | (labels == 1))
+            )
+            if (
+                labels.ndim != 1
+                or content.ndim != 2
+                or agent.ndim != 2
+                or labels.numel() != content.shape[0]
+                or labels.numel() != agent.shape[0]
+                or not labels_are_binary
+                or int(labels.sum()) != 1
+            ):
+                raise ValueError(
+                    f"Invalid cached labels in {cpath}. Expected exactly one "
+                    "mistake step. Regenerate this cache with "
+                    "feature_construction.py --overwrite_cache."
+                )
+            all_seqs.append(sequence)
         else:
-            print(f"[WARNING] Cache not found, skipping: {cpath}")
+            raise FileNotFoundError(
+                f"Cache not found: {cpath}. Run feature_construction.py for "
+                f"{data_dir} before training."
+            )
     return all_seqs
 
 
@@ -154,9 +178,8 @@ def run_experiment(args: argparse.Namespace) -> None:
     train_data = load_data_from_dir(args.train_dir)
     test_data = load_data_from_dir(args.test_dir)
 
-    if not train_data:
-        print("[ERROR] Training data is empty. Aborting.")
-        return
+    if not train_data or not test_data:
+        raise RuntimeError("Training and test data must both be non-empty")
 
     train_loader = DataLoader(
         SequenceDataset(train_data),
@@ -194,7 +217,7 @@ def run_experiment(args: argparse.Namespace) -> None:
         model.parameters(), lr=args.lr, weight_decay=args.weight_decay
     )
 
-    best_acc = 0.0
+    best_acc = -1.0
     stagnant_epochs = 0
 
     for epoch in range(args.epochs):

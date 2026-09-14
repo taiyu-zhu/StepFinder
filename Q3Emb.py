@@ -4,6 +4,9 @@ from transformers import AutoTokenizer, AutoModel
 from transformers.utils import is_flash_attn_2_available
 
 
+DEFAULT_MODEL_REVISION = "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+
+
 class Qwen3Embedding:
     """
     Lightweight wrapper around Qwen3-Embedding for encoding text into
@@ -13,30 +16,41 @@ class Qwen3Embedding:
     def __init__(
         self,
         model_name_or_path: str,
+        model_revision: str | None = DEFAULT_MODEL_REVISION,
         use_cuda: bool = True,
         max_length: int = 8192,
     ) -> None:
+        load_kwargs = {
+            "trust_remote_code": True,
+            "torch_dtype": torch.float16,
+        }
+        if model_revision:
+            load_kwargs["revision"] = model_revision
+
         if is_flash_attn_2_available() and use_cuda:
             self.model = AutoModel.from_pretrained(
                 model_name_or_path,
-                trust_remote_code=True,
                 attn_implementation="flash_attention_2",
-                torch_dtype=torch.float16,
+                **load_kwargs,
             )
         else:
             self.model = AutoModel.from_pretrained(
                 model_name_or_path,
-                trust_remote_code=True,
-                torch_dtype=torch.float16,
+                **load_kwargs,
             )
 
         if use_cuda:
             self.model = self.model.cuda()
+        self.model.eval()
 
+        tokenizer_kwargs = {
+            "trust_remote_code": True,
+            "padding_side": "left",
+        }
+        if model_revision:
+            tokenizer_kwargs["revision"] = model_revision
         self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name_or_path,
-            trust_remote_code=True,
-            padding_side="left",
+            model_name_or_path, **tokenizer_kwargs
         )
         self.max_length = max_length
 
