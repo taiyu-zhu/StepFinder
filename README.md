@@ -47,18 +47,6 @@ python feature_construction.py --data_dir ./data/Hand-Crafted/train
 python feature_construction.py --data_dir ./data/Hand-Crafted/test
 ```
 
-If Hugging Face downloads are slow or unavailable on your network, the same
-pinned revision can be downloaded through a mirror:
-
-```bash
-HF_ENDPOINT=https://hf-mirror.com \
-python feature_construction.py --data_dir ./data/Algorithm-Generated/test
-```
-
-Feature construction now fails with a clear error when neither
-`history[*].is_mistake` nor the root-level `mistake_step` is available, instead
-of silently creating an all-zero label.
-
 ## Step 2: Training and Evaluation
 
 StepFinder is trained and evaluated on each subset independently. The best checkpoint is saved automatically based on accuracy.
