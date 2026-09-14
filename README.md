@@ -6,9 +6,7 @@ StepFinder is a lightweight framework for step-level failure attribution in LLM-
 
 ## Requirements
 
-Python 3.10 or higher is required. Our verified environment uses Python 3.12,
-PyTorch 2.3.0 with CUDA 12.1, Transformers 4.51.3, and NumPy 1.26.4. To
-install the pinned requirements:
+Python 3.10 or higher is required. To install requirements:
 
 ```bash
 pip install -r requirements.txt
@@ -16,7 +14,7 @@ pip install -r requirements.txt
 
 ## Data Preparation
 
-The training trajectories are provided in this repository under `data/`. For evaluation, download the original Who&When benchmark test sets from [their repository](https://github.com/mingyin1/Agents_Failure_Attribution) and organize the data as follows. No manual label conversion is required: the feature construction code reads the root-level `mistake_step` field used by the original Who&When files.
+The training trajectories are provided in this repository under `data/`. For evaluation, download the Who&When benchmark test sets from [their repository](https://github.com/mingyin1/Agents_Failure_Attribution) and organize the data as follows:
 
 ```
 data/
@@ -32,10 +30,7 @@ We construct training trajectories using a trajectory regeneration strategy: giv
 
 ## Step 1: Feature Construction
 
-Encode execution logs into temporal semantic sequences using
-`Qwen/Qwen3-Embedding-0.6B`. The code pins model revision
-`97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3`. Encoded features are cached
-automatically and reused in subsequent runs.
+Encode execution logs into temporal semantic sequences using Qwen3-Embedding-0.6B. Encoded features are cached automatically and reused in subsequent runs.
 
 ```bash
 # Algorithm-Generated
@@ -62,10 +57,7 @@ python main.py \
 python main.py \
     --train_dir ./data/Hand-Crafted/train \
     --test_dir ./data/Hand-Crafted/test \
-    --save_path model/Hand-Crafted_best_model.pth \
-    --alpha 0.3 \
-    --beta 0.1 \
-    --gamma 0.75
+    --save_path model/Hand-Crafted_best_model.pth
 ```
 
 The key hyperparameters are listed below.
