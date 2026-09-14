@@ -68,8 +68,8 @@ def load_data_from_dir(data_dir: str) -> list:
             ):
                 raise ValueError(
                     f"Invalid cached labels in {cpath}. Expected exactly one "
-                    "mistake step. Regenerate this cache with "
-                    "feature_construction.py --overwrite_cache."
+                    "mistake step. Delete the stale cache directory and rerun "
+                    "feature_construction.py."
                 )
             all_seqs.append(sequence)
         else:

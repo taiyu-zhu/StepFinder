@@ -165,7 +165,6 @@ def encode_dir(
     data_dir: str,
     extractor: TemporalFeatureExtractor,
     filenames: list[str] | None = None,
-    overwrite_cache: bool = False,
 ) -> list:
     """
     Encode all JSON execution logs in data_dir into embedding features.
@@ -185,7 +184,7 @@ def encode_dir(
     for filename in tqdm(file_list, desc=f"Encoding {os.path.basename(data_dir)}"):
         cache_path = _get_cache_path(data_dir, filename)
 
-        if os.path.exists(cache_path) and not overwrite_cache:
+        if os.path.exists(cache_path):
             all_features.append(torch.load(cache_path, weights_only=False))
             continue
 
@@ -229,11 +228,6 @@ if __name__ == "__main__":
     )
     parser.add_argument("--content_dim", type=int, default=128, help="Content embedding dimension.")
     parser.add_argument("--agent_dim", type=int, default=32, help="Agent embedding dimension.")
-    parser.add_argument(
-        "--overwrite_cache",
-        action="store_true",
-        help="Regenerate existing cached features.",
-    )
     args = parser.parse_args()
 
     extractor = TemporalFeatureExtractor(
@@ -242,4 +236,4 @@ if __name__ == "__main__":
         content_dim=args.content_dim,
         agent_dim=args.agent_dim,
     )
-    encode_dir(args.data_dir, extractor, overwrite_cache=args.overwrite_cache)
+    encode_dir(args.data_dir, extractor)

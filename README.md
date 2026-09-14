@@ -55,18 +55,6 @@ HF_ENDPOINT=https://hf-mirror.com \
 python feature_construction.py --data_dir ./data/Algorithm-Generated/test
 ```
 
-If features were generated with an earlier version of StepFinder, regenerate
-them once so that labels from the original Who&When format are rebuilt:
-
-```bash
-python feature_construction.py \
-    --data_dir ./data/Algorithm-Generated/test \
-    --overwrite_cache
-python feature_construction.py \
-    --data_dir ./data/Hand-Crafted/test \
-    --overwrite_cache
-```
-
 Feature construction now fails with a clear error when neither
 `history[*].is_mistake` nor the root-level `mistake_step` is available, instead
 of silently creating an all-zero label.
